@@ -3,6 +3,7 @@ const express = require('express')
 const authRouter = require('./auth/auth-router')
 const usersRouter = require('./users/users-router.js')
 const session = require('express-session')
+const Store = require('connect-session-knex')(session)
 
 const server = express()
 
@@ -18,6 +19,13 @@ server.use(session({
   },
   resave: false,
   saveUninitialized: false,
+  store: new Store({
+    knex: require('../database/db-config'),
+    tablename: 'sessions',
+    sidfieldname: 'sid',
+    createtable: true,
+    clearInterval: 1000 * 60 * 60,
+  })
 }))
 
 server.use('/api/auth', authRouter)
